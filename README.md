@@ -1,15 +1,11 @@
 # NAME
 
-mykomap-site-example: UPDATE ME
+workers-coop-map - a map of the members of workers.coop
 
 # SYNOPSIS
 
-UPDATE ME TOO
-
-This is a demonstration/pilot project showing how to use the [`mykomap`][1] package.
+This map uses the [`mykomap`][1] package, and data from the `workers-coop` dataset in [`open-data`][2]
 
 [1]: https://github.com/DigitalCommons/mykomap
+[2]: https://github.com/DigitalCommons/open-data
 
-For details of how to do that, see the `mykomap` project's own
-documentation. This is merely a supplementary example, which you can
-use to base new projects on.

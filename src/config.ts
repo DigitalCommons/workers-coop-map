@@ -15,7 +15,7 @@ import * as versions from "./version.json";
 import { InitiativeObj } from "mykomap/src/map-app/app/model/initiative";
 
 type Row = Record<string, string|null|undefined>;
-const baseUri = 'https://update-me/some/path/';
+const baseUri = 'https://dev.lod.coop/workers-coop/';
 
 const rowToObj = mkObjTransformer<Row, InitiativeObj>({
   uri: T.prefixed(baseUri).from('Identifier'),
@@ -38,8 +38,8 @@ const fields: FieldsDef = {
 
 
 export const config: ConfigData = new ConfigData({
-  namedDatasets: ['update-me'],
-  htmlTitle: 'UPDATE ME',
+  namedDatasets: ['workers-coop'],
+  htmlTitle: 'Workers.Coop',
   fields: fields,
   filterableFields: [
   ],
@@ -52,10 +52,10 @@ export const config: ConfigData = new ConfigData({
   ],
   dataSources: [
     {
-      id: 'data-exaple-update-me',
-      label: 'UPDATE ME',
+      id: 'workers-coop',
+      label: 'Workers.Coop',
       type: 'csv',
-      url: 'update-me.csv',
+      url: 'https://dev.data.solidarityeconomy.coop/workers-coop/standard.csv',
       transform: rowToObj,
     },
   ],

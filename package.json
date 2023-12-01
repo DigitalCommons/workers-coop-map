@@ -1,7 +1,7 @@
 {
-  "name": "UPDATE ME",
+  "name": "workers-coop-map",
   "version": "0.1.0",
-  "description": "UPDATE ME",
+  "description": "a map of the members of workers.coop",
   "main": "src/index.ts",
   "config": {
     "deploy_to": "",
@@ -15,7 +15,7 @@
   },
   "author": "Digital Commons Cooperative",
   "license": "UNLICENSED",
-  "repository": "github:DigitalCommons/UPDATE ME",
+  "repository": "github:DigitalCommons/workers-coop-map",
   "dependencies": {
     "mykomap": "github:DigitalCommons/mykomap#semver:^3.1.4"
   }
