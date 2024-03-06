@@ -168,21 +168,21 @@ function getReportLink(initiative: Initiative, sse_initiatives: DataServices, pr
   return `<a href="./correction-report.html?${params.join('&')}">${label}</a>`;
 }
 
-export function getPopup(initiative: Initiative, sse_initiatives: DataServices) {
+export function getPopup(initiative: Initiative, dataServices: DataServices) {
   function getTerm(propertyName: string) {
-    const propDef = sse_initiatives.getPropertySchema(propertyName);
+    const propDef = dataServices.getPropertySchema(propertyName);
     const term = initiative[propertyName];
     if (typeof term !== 'string')
       throw new Error(`non-string value for property ${propertyName}`);  
     if (propDef.type === 'vocab') {
       const vocabUri = propDef.uri;
-      return sse_initiatives.getVocabTerm(vocabUri, term);
+      return dataServices.getVocabTerm(vocabUri, term);
     }
     throw new Error(`can't get term for non-vocab property ${propertyName}`);
   }
 
-  const values = sse_initiatives.getLocalisedVocabs();
-  const labels = sse_initiatives.getFunctionalLabels();
+  const values = dataServices.getLocalisedVocabs();
+  const labels = dataServices.getFunctionalLabels();
   const props = ['uri', 'name', 'website']; // Need to be mapped to CiviCRM field names?
   let popupHTML = `
     <div class="sea-initiative-details">
@@ -194,7 +194,7 @@ export function getPopup(initiative: Initiative, sse_initiatives: DataServices) 
       <h5 class="sea-initiative-secondary-activity">${getSecondaryActivities(initiative, values["aci:"], labels)}</h5>
       <p>${initiative.desc || ''}</p>
 
-      <p>${getReportLink(initiative, sse_initiatives, props)}</p>
+      <p>${getReportLink(initiative, dataServices, props)}</p>
     </div>
     
     <div class="sea-initiative-contact">
