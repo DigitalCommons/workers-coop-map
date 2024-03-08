@@ -11,7 +11,7 @@ import {
 import * as versions from "./version.json";
 
 //import about from "./about.html"; // Uncomment if custom about.html needed
-//import { getPopup } from './popup'; // Uncomment if custom popup needed
+import { getPopup } from './popup';
 import { InitiativeObj } from "mykomap/src/map-app/app/model/initiative";
 
 type Row = Record<string, string|null|undefined>;
@@ -20,20 +20,45 @@ const baseUri = 'https://dev.lod.coop/workers-coop/';
 const rowToObj = mkObjTransformer<Row, InitiativeObj>({
   uri: T.prefixed(baseUri).from('Identifier'),
   name: T.text('').from('Name'),
-  address: T.text('').from('Address'),
   lat: T.nullable.number(null).from('Latitude'),
   lng: T.nullable.number(null).from('Longitude'),
-  manLat: T.nullable.number(null).from('Geocoded Latitude'),
-  manLng: T.nullable.number(null).from('Geocoded Longitude'),
-  description: T.text('').from('Description'),
+  manLat: T.nullable.number(null).from('Geo Container Latitude'),
+  manLng: T.nullable.number(null).from('Geo Container Longitude'),
+  desc: T.text('').from('Description'),
+  baseMembershipType: T.nullable.prefixed('bmt:').from('Membership Type'),
+  orgStructure: T.nullable.prefixed('os:').from('Organisational Structure'),
+  primaryActivity: T.nullable.prefixed('aci:').from('Primary Activity'),
+  street: T.text('').from('Street Address'),
+  locality: T.text('').from('Locality'),
+  postcode: T.text('').from('Postcode'),
+  www: T.nullable.text(null).from('Website'),
+  chNum: T.nullable.text(null).from('Companies House Number'),
+  within: T.nullable.text(null).from('Geo Container'),
 });
 
 
 type Dictionary<T> = Partial<Record<string, T>>;
 type FieldsDef = Dictionary<PropDef | 'value' >;
 const fields: FieldsDef = {
-  description: 'value',
-  address: 'value',
+  desc: 'value',
+  street: 'value',
+  locality: 'value',
+  postcode: 'value',
+  www: 'value',
+  chNum: 'value',
+  baseMembershipType: {
+    type: 'vocab',
+    uri: 'bmt:',
+  },
+  orgStructure: {
+    type: 'vocab',
+    uri: 'os:',
+  },
+  primaryActivity: {
+    type: 'vocab',
+    uri: 'aci:',
+  },
+  within: 'value',
 };
 
 
@@ -49,6 +74,24 @@ export const config: ConfigData = new ConfigData({
   languages: ['EN'],
   language: 'EN',
   vocabularies: [
+    {
+      type: 'json',
+      id: 'essglobal',
+      label: 'ESSGLOBAL 2.1',
+      url: 'https://dev.data.solidarityeconomy.coop/workers-coop/vocabs.json',
+    },/*
+    {
+      type: 'json',
+      id: 'workerscoop',
+      label: 'Workers.Coop',
+      url: 'https://dev.data.solidarityeconomy.coop/workers.coop/wc-vocabs.json',
+    },
+    {
+      type: 'json',
+      id: 'translations',
+      label: 'Translations',
+      url: 'translations.json',
+    },*/
   ],
   dataSources: [
     {
@@ -61,7 +104,7 @@ export const config: ConfigData = new ConfigData({
   ],
   showDatasetsPanel: false,
   showDirectoryPanel: false,
-//  customPopup: getPopup, // uncomment if custom popup wanted
+  customPopup: getPopup,
 //  aboutHtml: about, // uncomment if custom about.html wanted
   ...versions,
 });

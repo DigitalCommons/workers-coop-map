@@ -1,122 +1,9 @@
-import type { DataServices } from "mykomap/app/model/data-services";
-import type { Vocab } from "mykomap/app/model/vocabs";
+import { DataServices, isVocabPropDef } from "mykomap/app/model/data-services";
+import type { Vocab, VocabServices } from "mykomap/app/model/vocabs";
 import { Initiative } from "mykomap/src/map-app/app/model/initiative";
 import { PhraseBook } from "mykomap/src/map-app/localisations";
 
-function getAddress(initiative: Initiative, getTerm: (prop: string) => string, labels: PhraseBook) {
-  // We want to add the whole address into a single para
-  // Not all orgs have an address
-  let address = "";
-  if (typeof initiative.street === 'string') {
-    let street = '';
-    let streetArray = initiative.street.split(";");
-    for (let partial of streetArray) {
-      if (partial === initiative.name) continue;
-      if (street) street += "<br/>";
-      street += partial;
-    }
-    address += street;
-  }
-  if (initiative.locality) {
-    address += (address.length ? "<br/>" : "") + initiative.locality;
-  }
-  if (initiative.region) {
-    address += (address.length ? "<br/>" : "") + initiative.region;
-  }
-  if (initiative.postcode) {
-    address += (address.length ? "<br/>" : "") + initiative.postcode;
-  }
-  if (initiative.countryId) {
-    const countryName = getTerm('countryId');
-    address += (address.length ? "<br/>" : "") + (countryName || initiative.countryId);
-  }
-  if (initiative.nongeo == 1 || !initiative.lat || !initiative.lng) {
-    address += (address.length ? "<br/>" : "") + `<i>${labels.noLocation}</i>`;
-  }
-  if (address.length) {
-    address = '<p class="sea-initiative-address">' + address + "</p>";
-  }
-  return address;
-}
 
-function getWebsite(initiative: Initiative) {
-  // Initiative's website. Note, not all have a website.
-  if (initiative.www)
-    return `<a href="${initiative.www}" target="_blank" >${initiative.www}</a>`;
-  return '';
-}
-
-function getBMT(initiative: Initiative, bmtVocab: Vocab) {
-  if (typeof initiative.baseMembershipType === 'string') {
-    return `${bmtVocab.title}: ${bmtVocab.terms[initiative.baseMembershipType]}`;
-  }
-
-  return `${bmtVocab.title}: Others`;
-}
-
-function getOrgStructure(initiative: Initiative, osVocab: Vocab, qfVocab: Vocab) {
-  if (!initiative.qualifier && typeof initiative.orgStructure === 'string') {
-    const term = osVocab.terms[initiative.orgStructure];
-    return `${osVocab.title}: ${term}`;
-  }
-
-  if (!initiative.qualifier && typeof initiative.regorg === 'string') {
-    if (!osVocab.terms[initiative.regorg])
-      console.error(`Unknown ${osVocab.title} vocab term ID: ${initiative.regorg}`);
-    return `${osVocab.title}: ${osVocab.terms[initiative.regorg]}`;
-  }
-
-  if (typeof initiative.qualifier === 'string') {
-    if (!qfVocab.terms[initiative.qualifier]) {
-      qfVocab.terms[initiative.qualifier] = "unknown";
-      console.error(`Unknown ${qfVocab.title} vocab term ID: ${initiative.qualifier}`);
-    }
-
-    return `${osVocab.title}: ${qfVocab.terms[initiative.qualifier]}`;
-  }
-
-  return '';
-}
-
-function getPrimaryActivity(initiative: Initiative, acVocab: Vocab) {
-  if (typeof initiative.primaryActivity === 'string' && initiative.primaryActivity != "") {
-    return `${acVocab.title}: ${acVocab.terms[initiative.primaryActivity]}`;
-  }
-
-  return '';
-}
-
-function getSecondaryActivities(initiative: Initiative, acVocab: Vocab, labels: PhraseBook) {
-  const title = labels.secondaryActivities;
-
-  if (initiative.activities instanceof Array && initiative.activities.length > 0) {
-    const term = initiative.activities.map((id: unknown) => acVocab.terms[String(id)]).join(", ");
-    return `${title}: ${term}`;
-  }
-
-  return '';
-}
-
-function getEmail(initiative: Initiative) {
-  // Not all orgs have an email
-  if (initiative.email)
-    return `<a class="fa fa-at" href="mailto:${initiative.email}" target="_blank" ></a>`;
-  return "";
-}
-
-function getFacebook(initiative: Initiative) {
-  // not all have a facebook
-  if (initiative.facebook)
-    return `<a class="fab fa-facebook" href="https://facebook.com/${initiative.facebook}" target="_blank" ></a>`;
-  return "";
-}
-
-function getTwitter(initiative: Initiative) {
-  // not all have twitter
-  if (initiative.twitter)
-    return `<a class="fab fa-twitter" href="https://twitter.com/${initiative.twitter}" target="_blank" ></a>`;
-  return '';
-}
 
 // Returns an array of at least one string, which may be empty.
 function stringify(value: unknown): string[] {
@@ -143,10 +30,9 @@ function stringify(value: unknown): string[] {
   }
 }
 
-function getReportLink(initiative: Initiative, sse_initiatives: DataServices, props: string[]) {
-  var labels = sse_initiatives.getLocalisedVocabs();
+function getReportLink(initiative: Initiative, dataServices: DataServices, props: string[]) {
   var params = props.map(name => {
-    const propDef = sse_initiatives.getPropertySchema(name);
+    const propDef = dataServices.getPropertySchema(name);
     const value = initiative[name];
     if (propDef == undefined)
       return undefined;
@@ -164,11 +50,209 @@ function getReportLink(initiative: Initiative, sse_initiatives: DataServices, pr
     return `${encodeURIComponent(name)}=${encodeURIComponent(paramVal)}?`;
   }).filter(val => val !== undefined);
 
-  var label: string = typeof labels.reportAnError === 'string'? labels.reportAnError : 'report an error';
+  var label: string = // FIXME typeof labels.reportAnError === 'string'? labels.reportAnError :
+    'report an error';
   return `<a href="./correction-report.html?${params.join('&')}">${label}</a>`;
 }
 
+class PopupApi {
+  private readonly dataServices: DataServices;
+  private readonly vocabs: VocabServices;
+  readonly lang: string;
+  readonly labels: PhraseBook;
+  addressFields: string[] = [ // Historical defaults. Can be overridden.
+    'street',
+    'locality',
+    'region',
+    'postcode',
+    'countryId',
+  ];
+  
+  constructor(private readonly initiative: Initiative, dataServices: DataServices) {
+    this.dataServices = dataServices;
+    this.vocabs = dataServices.getVocabs();
+    this.lang = dataServices.getLanguage();
+    this.labels = dataServices.getFunctionalLabels();
+  }
+  
+  getTitle(vocabUri: string, defaultVal?: string): string {
+    const title = this.vocabs.getVocab(vocabUri, this.lang)?.title;
+    if (title)
+      return title;
+    if (defaultVal !== undefined)
+      return defaultVal;
+    return this.labels.notAvailable;
+  }
+  
+  getTerms(propertyName: string): string[] {
+    const propDef = this.dataServices.getPropertySchema(propertyName);
+    const propVal = this.initiative[propertyName];
+    if (isVocabPropDef(propDef)) {
+      if (propDef.type === 'multi' && propVal instanceof Array) {
+        return propVal.map((val:unknown) => this.vocabs.getTerm(String(val), this.lang));
+      }
+      if (typeof propVal === 'string')
+        return [this.vocabs.getTerm(propVal, this.lang)];
+      if (propVal === undefined)
+        return [this.labels.notAvailable];
+      throw new Error(`invalid vocab property value for ${propertyName}: ${propVal}`);
+    }
+    throw new Error(`can't get term for non-vocab property ${propertyName}`);
+  }
+  
+  getTerm(propertyName: string, defaultVal?: string): string {
+    const vals = this.getTerms(propertyName);
+    if (vals.length > 0)
+      return vals[0];
+    if (defaultVal !== undefined)
+      return defaultVal;
+    return this.labels.notAvailable;
+  }
+
+  getVal(propertyName: string, defaultVal?: string): string {
+    const propVal = this.initiative[propertyName];
+    if (propVal !== undefined && propVal !== null) // null or undefined
+      return String(propVal);
+    if (defaultVal !== undefined)
+      return defaultVal;
+    return this.labels.notAvailable;
+  }
+
+  getVocab(uri: string): Vocab {
+    return this.vocabs.getVocab(uri, this.lang);
+  }
+
+  // Converts a pure id, or a vocab URI, into the equivalent label in the current language
+  getLabel(uri: string, defaultVal?: string): string {
+    if (uri.indexOf(':') < 0)
+      return (
+        (this.labels as undefined as Record<string, string|undefined>)[uri]
+          ?? defaultVal
+          ?? this.labels.notAvailable
+      );
+    return this.vocabs.getTerm(uri, this.lang, defaultVal);   
+  }
+
+  escapeHtml(text: unknown): string {
+    return String(text)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+  
+  // Expands a template with a value, but only if the value given is
+  // not undefined, null, or the empty string (when stringified).
+  //
+  // Otherwise, if a `default` option is given, that is returned,
+  // and if absent, the empty string.
+  //
+  // The template is a string in which all values of `%s` are replaced
+  // by the value, and all values of `%%` are replaced with `%`. (This
+  // is so that percents can be inserted. In other words: to insert
+  // a literal `%s`, use `%%s`).
+  //
+  // Note: unless the `escape` option is present and false, the value
+  // itself will be HTML escaped. The template and defaultValue will not be.
+  insert(value: unknown, template: string, opts: {default?: string, escape?: boolean} = {}): string {
+    const defaultValue = opts.default ?? '';
+    
+    if (value === undefined || value === null)
+      return defaultValue;
+
+    let str = String(value);
+
+    if (str === '')
+      return defaultValue;
+
+    if (opts.escape !== false)
+      str = this.escapeHtml(str);
+
+    return template.replaceAll(/(?<!%)%s/g, str).replaceAll('%%', '%');
+  }
+
+  mailLink(propertyName: string): string {
+    return this.insert(this.initiative[propertyName], 
+                       '<a class="fa fa-at" href="mailto:%s" target="_blank" ></a>');
+  }
+  
+  expandedLink(propertyName: string, template: string, baseUri: string = ''): string {
+    let value = this.initiative[propertyName];
+    if (typeof value !== 'string')
+      return '';
+    if (value === '')
+      return '';
+    let url: string = value;
+    if (!url.match(/^https?:/))
+      url = baseUri.replace(/[/]*$/, '') + url.replace(/^[/]+/, '/');
+
+    url = encodeURI(url);
+    
+    return template.replaceAll(/(?<!%)%s/g, url).replaceAll('%%', '%');
+  }
+  
+  facebookLink(propertyName: string): string {
+    return this.expandedLink(propertyName,
+                             '<a class="fab fa-facebook" href="%s" target="_blank" ></a>',
+                            'https://facebook.com');
+  }
+  
+  twitterLink(propertyName: string): string {
+    return this.expandedLink(propertyName,
+                             '<a class="fab fa-twitter" href="%s" target="_blank" ></a>',
+                             'https://x.com');
+  }
+  
+  phoneLink(propertyName: string): string {
+    return this.insert(this.initiative[propertyName],
+                       '<a class="fa fa-at" href="tel:%s" target="_blank" ></a>');
+  }
+  
+  address(): string {
+
+    // We want to add the whole address into a single para
+    // Not all orgs have an address
+    const addressAry = this.addressFields.flatMap(field => {
+      const value = this.initiative[field];
+      if (typeof value !== 'string')
+        return [];
+      let str: string = value.trim();
+      if (str === '')
+        return [];
+      
+      str = this
+        .escapeHtml(str)
+        .replaceAll(/\s*[,\n;]+\s*/g, "<br/>")
+        .replaceAll(/\s+/g, " ");
+      
+      /* FIXME expand terms      
+      if (this.initiative.countryId) {
+        const countryName = this.getTerm('countryId');
+        address += (address.length ? "<br/>" : "") + (countryName || this.initiative.countryId);
+        }*/
+      return str;
+    });
+    
+    if ((!this.initiative.lat || !this.initiative.lng)
+      && (!this.initiative.manLat || !this.initiative.manLat)) {
+      addressAry.push(`<i>${this.escapeHtml(this.labels.noLocation)}</i>`);
+    }
+
+    if (addressAry.length) {
+      return `<p class="sea-initiative-address">${addressAry.join('</br>')}</p>`;
+    }
+    
+    return '';
+  }
+}
+
 export function getPopup(initiative: Initiative, dataServices: DataServices) {
+  const api = new PopupApi(initiative, dataServices);
+  const labels = dataServices.getFunctionalLabels();
+  /*
+  const lang = dataServices.getLanguage();
+  const vocabs = dataServices.getVocabs();
   function getTerm(propertyName: string) {
     const propDef = dataServices.getPropertySchema(propertyName);
     const term = initiative[propertyName];
@@ -176,39 +260,35 @@ export function getPopup(initiative: Initiative, dataServices: DataServices) {
       throw new Error(`non-string value for property ${propertyName}`);  
     if (propDef.type === 'vocab') {
       const vocabUri = propDef.uri;
-      return dataServices.getVocabTerm(vocabUri, term);
+      return vocabs.getVocab(vocabUri, term).terms[propertyName];
     }
     throw new Error(`can't get term for non-vocab property ${propertyName}`);
   }
-
-  const values = dataServices.getLocalisedVocabs();
-  const labels = dataServices.getFunctionalLabels();
+*/
   const props = ['uri', 'name', 'website']; // Need to be mapped to CiviCRM field names?
   let popupHTML = `
     <div class="sea-initiative-details">
 	    <h2 class="sea-initiative-name">${initiative.name}</h2>
-	    ${getWebsite(initiative)}
-	    <h4 class="sea-initiative-base-membership-type">${getBMT(initiative, values["bmt:"])}</h4>
-	    <h4 class="sea-initiative-org-structure">${getOrgStructure(initiative, values["os:"], values["qf:"])}</h4>
-	    <h4 class="sea-initiative-economic-activity">${getPrimaryActivity(initiative, values["aci:"])}</h4>
-      <h5 class="sea-initiative-secondary-activity">${getSecondaryActivities(initiative, values["aci:"], labels)}</h5>
-      <p>${initiative.desc || ''}</p>
+	    ${api.expandedLink('www','<a href="%s" target="_blank">%s</a>')}
+	    <h4 class="sea-initiative-bmt">${api.getTitle('bmt:')}: ${api.getTerm('baseMembershipType') ?? labels.notAvailable}</h4>
+	    <h4 class="sea-initiative-os">${api.getTitle('os:')}: ${api.getTerm('orgStructure') ?? labels.notAvailable}</h4>
+	    <h4 class="sea-initiative-aci">${api.getTitle('aci:')}: ${api.getTerm('primaryActivity') ?? labels.notAvailable}</h4>
+      <p>${initiative.description || ''}</p>
 
       <p>${getReportLink(initiative, dataServices, props)}</p>
     </div>
     
     <div class="sea-initiative-contact">
-      <h3>${labels.contact}</h3>
-      ${getAddress(initiative, getTerm, labels)}
+      <h3>${api.labels.contact}</h3>
+      ${api.address()}
       
       <div class="sea-initiative-links">
-        ${getEmail(initiative)}
-        ${getFacebook(initiative)}
-        ${getTwitter(initiative)}
+        ${api.mailLink('email')}
+        ${api.facebookLink('facebook')}
+        ${api.twitterLink('twitter')}
       </div>
     </div>
   `;
 
   return popupHTML;
 };
-
