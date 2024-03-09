@@ -25,12 +25,20 @@ const rowToObj = mkObjTransformer<Row, InitiativeObj>({
   manLat: T.nullable.number(null).from('Geo Container Latitude'),
   manLng: T.nullable.number(null).from('Geo Container Longitude'),
   desc: T.text('').from('Description'),
-  baseMembershipType: T.nullable.prefixed('bmt:').from('Membership Type'),
-  orgStructure: T.nullable.prefixed('os:').from('Organisational Structure'),
-  primaryActivity: T.nullable.prefixed('aci:').from('Primary Activity'),
+  baseMembershipType: T.nullable.prefixed('bmt:', null).from('Membership Type'),
+  orgStructure: T.nullable.prefixed('os:', null).from('Organisational Structure'),
+  primaryActivity: T.nullable.prefixed('aci:', null).from('Primary Activity'),
+  industry: T.nullable.prefixed('ind:', null).from('Industry'),
+  sicCode: T.nullable.prefixed('sic:', null).from('Sic Code'),
+  sicSecion: T.nullable.prefixed('sics:', null).from('SIC Section'),
+  ownershipType: T.nullable.prefixed('ot:', null).from('Ownership Classification'),
+  legalForm: T.nullable.prefixed('lf:', null).from('Legal Form'),
+  regStatus: T.nullable.prefixed('rst:', null).from('Registered Status'),
+  regNo: T.nullable.text(null).from('Registered Number'),
   street: T.text('').from('Street Address'),
   locality: T.text('').from('Locality'),
   postcode: T.text('').from('Postcode'),
+  email: T.nullable.text(null).from('Email'),
   www: T.nullable.text(null).from('Website'),
   chNum: T.nullable.text(null).from('Companies House Number'),
   within: T.nullable.text(null).from('Geo Container'),
@@ -45,7 +53,10 @@ const fields: FieldsDef = {
   locality: 'value',
   postcode: 'value',
   www: 'value',
+  email: 'value',
   chNum: 'value',
+  manLat: 'value',
+  manLng: 'value',
   baseMembershipType: {
     type: 'vocab',
     uri: 'bmt:',
@@ -58,6 +69,31 @@ const fields: FieldsDef = {
     type: 'vocab',
     uri: 'aci:',
   },
+  industry: {
+    type: 'vocab',
+    uri: 'ind:',
+  },
+  sicCode: {
+    type: 'vocab',
+    uri: 'sic:',
+  },
+  sicSecion: {
+    type: 'vocab',
+    uri: 'sics:',
+  },
+  ownershipType: {
+    type: 'vocab',
+    uri: 'ot:',
+  },
+  legalForm: {
+    type: 'vocab',
+    uri: 'lf:',
+  },
+  regStatus: {
+    type: 'vocab',
+    uri: 'rst:',
+  },
+  regNo: 'value',
   within: 'value',
 };
 
@@ -79,19 +115,13 @@ export const config: ConfigData = new ConfigData({
       id: 'essglobal',
       label: 'ESSGLOBAL 2.1',
       url: 'https://dev.data.solidarityeconomy.coop/workers-coop/vocabs.json',
-    },/*
+    },
     {
       type: 'json',
       id: 'workerscoop',
       label: 'Workers.Coop',
-      url: 'https://dev.data.solidarityeconomy.coop/workers.coop/wc-vocabs.json',
+      url: 'wc-vocabs.json',
     },
-    {
-      type: 'json',
-      id: 'translations',
-      label: 'Translations',
-      url: 'translations.json',
-    },*/
   ],
   dataSources: [
     {

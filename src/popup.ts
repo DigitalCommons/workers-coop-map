@@ -250,29 +250,17 @@ class PopupApi {
 export function getPopup(initiative: Initiative, dataServices: DataServices) {
   const api = new PopupApi(initiative, dataServices);
   const labels = dataServices.getFunctionalLabels();
-  /*
-  const lang = dataServices.getLanguage();
-  const vocabs = dataServices.getVocabs();
-  function getTerm(propertyName: string) {
-    const propDef = dataServices.getPropertySchema(propertyName);
-    const term = initiative[propertyName];
-    if (typeof term !== 'string')
-      throw new Error(`non-string value for property ${propertyName}`);  
-    if (propDef.type === 'vocab') {
-      const vocabUri = propDef.uri;
-      return vocabs.getVocab(vocabUri, term).terms[propertyName];
-    }
-    throw new Error(`can't get term for non-vocab property ${propertyName}`);
-  }
-*/
   const props = ['uri', 'name', 'website']; // Need to be mapped to CiviCRM field names?
   let popupHTML = `
     <div class="sea-initiative-details">
-	    <h2 class="sea-initiative-name">${initiative.name}</h2>
-	    ${api.expandedLink('www','<a href="%s" target="_blank">%s</a>')}
-	    <h4 class="sea-initiative-bmt">${api.getTitle('bmt:')}: ${api.getTerm('baseMembershipType') ?? labels.notAvailable}</h4>
-	    <h4 class="sea-initiative-os">${api.getTitle('os:')}: ${api.getTerm('orgStructure') ?? labels.notAvailable}</h4>
-	    <h4 class="sea-initiative-aci">${api.getTitle('aci:')}: ${api.getTerm('primaryActivity') ?? labels.notAvailable}</h4>
+	    <h2 class="sea-initiative-name">${api.escapeHtml(initiative.name)}</h2>
+	    <p>${api.expandedLink('www','<a href="%s" target="_blank">%s</a>')}</p>
+	    <h4 class="sea-initiative-ind">${api.getTitle('ind:')}: ${api.getTerm('industry')}</h4>
+	    <h4 class="sea-initiative-sics">${api.getTitle('sics:')}: ${api.getTerm('sicSecion')}</h4>
+	    <h4 class="sea-initiative-ot">${api.getTitle('ot:')}: ${api.getTerm('ownershipType')}</h4>
+	    <h4 class="sea-initiative-lf">${api.getTitle('lf:')}: ${api.getTerm('legalForm')}</h4>
+	    <h4 class="sea-initiative-regno">${api.getLabel('ui:regNo')}: ${api.getVal('regNo')}</h4>
+	    <h4 class="sea-initiative-rst">${api.getTitle('rst:')}: ${api.getTerm('regStatus')}</h4>
       <p>${initiative.description || ''}</p>
 
       <p>${getReportLink(initiative, dataServices, props)}</p>
@@ -282,11 +270,10 @@ export function getPopup(initiative: Initiative, dataServices: DataServices) {
       <h3>${api.labels.contact}</h3>
       ${api.address()}
       
-      <div class="sea-initiative-links">
-        ${api.mailLink('email')}
-        ${api.facebookLink('facebook')}
-        ${api.twitterLink('twitter')}
-      </div>
+      <p>
+        ${api.insert(initiative.email,
+                     '<a href="mailto:%s" target="_blank" >%s</a>')}
+      </p>
     </div>
   `;
 
