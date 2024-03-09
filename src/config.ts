@@ -10,7 +10,7 @@ import {
 } from "mykomap/obj-transformer";
 import * as versions from "./version.json";
 
-//import about from "./about.html"; // Uncomment if custom about.html needed
+import about from "./about.html";
 import { getPopup } from './popup';
 import { InitiativeObj } from "mykomap/src/map-app/app/model/initiative";
 
@@ -135,6 +135,6 @@ export const config: ConfigData = new ConfigData({
   showDatasetsPanel: false,
   showDirectoryPanel: false,
   customPopup: getPopup,
-//  aboutHtml: about, // uncomment if custom about.html wanted
+  aboutHtml: about,
   ...versions,
 });
