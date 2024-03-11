@@ -138,6 +138,7 @@ export const config: ConfigData = new ConfigData({
   ],
   showDatasetsPanel: false,
   showDirectoryPanel: true,
+  logo: "logo.png",
   customPopup: getPopup,
   aboutHtml: about,
   ...versions,
