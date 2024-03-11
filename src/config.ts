@@ -103,8 +103,12 @@ export const config: ConfigData = new ConfigData({
   htmlTitle: 'Workers.Coop',
   fields: fields,
   filterableFields: [
+    'industry',
+    'ownershipType',
+//    'regStatus',
   ],
   searchedFields: [
+    'name',
     'description',
   ],
   languages: ['EN'],
