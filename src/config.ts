@@ -137,7 +137,7 @@ export const config: ConfigData = new ConfigData({
     },
   ],
   showDatasetsPanel: false,
-  showDirectoryPanel: false,
+  showDirectoryPanel: true,
   customPopup: getPopup,
   aboutHtml: about,
   ...versions,
