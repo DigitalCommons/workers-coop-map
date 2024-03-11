@@ -10,6 +10,61 @@
     />
     <link rel="stylesheet" href="map-app/map-app.css" />
     <style type="text/css">
+      /* font definitions are lifted from worker.coop source */
+/*      @import url("https://p.typekit.net/p.css?s=1&k=phr8xtw&ht=tk&f=37543.37544.37545.37546.40446.40448.40450.50118&a=958097&app=typekit&e=css");
+*/
+      @font-face {
+        font-family:"work-sans";
+        src:url("https://use.typekit.net/af/c3941c/00000000000000007735c13d/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/c3941c/00000000000000007735c13d/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/c3941c/00000000000000007735c13d/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"work-sans";
+        src:url("https://use.typekit.net/af/5edda4/00000000000000007735c14a/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("woff2"),url("https://use.typekit.net/af/5edda4/00000000000000007735c14a/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("woff"),url("https://use.typekit.net/af/5edda4/00000000000000007735c14a/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:500;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"work-sans";
+        src:url("https://use.typekit.net/af/c0e675/00000000000000007735c159/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n6&v=3") format("woff2"),url("https://use.typekit.net/af/c0e675/00000000000000007735c159/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n6&v=3") format("woff"),url("https://use.typekit.net/af/c0e675/00000000000000007735c159/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n6&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:600;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"work-sans";
+        src:url("https://use.typekit.net/af/5636ba/00000000000000007735c15a/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"),url("https://use.typekit.net/af/5636ba/00000000000000007735c15a/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"),url("https://use.typekit.net/af/5636ba/00000000000000007735c15a/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:700;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"rubik";
+        src:url("https://use.typekit.net/af/efda02/00000000000000007735b914/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/efda02/00000000000000007735b914/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/efda02/00000000000000007735b914/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"rubik";
+        src:url("https://use.typekit.net/af/ae418c/00000000000000007735b917/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("woff2"),url("https://use.typekit.net/af/ae418c/00000000000000007735b917/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("woff"),url("https://use.typekit.net/af/ae418c/00000000000000007735b917/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:500;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"rubik";
+        src:url("https://use.typekit.net/af/1aad1a/00000000000000007735b91a/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"),url("https://use.typekit.net/af/1aad1a/00000000000000007735b91a/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"),url("https://use.typekit.net/af/1aad1a/00000000000000007735b91a/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:700;font-stretch:normal;
+      }
+
+      @font-face {
+        font-family:"rubik";
+        src:url("https://use.typekit.net/af/0fd843/00000000000000007735fee1/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n6&v=3") format("woff2"),url("https://use.typekit.net/af/0fd843/00000000000000007735fee1/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n6&v=3") format("woff"),url("https://use.typekit.net/af/0fd843/00000000000000007735fee1/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n6&v=3") format("opentype");
+        font-display:auto;font-style:normal;font-weight:600;font-stretch:normal;
+      }
+      :root {
+        --sea-font-family-sans-serif: "work-sans", Arial, sans-serif;
+        --sea-font-family-emphasis: "rubik", sans-serif;
+      }
+      
       body {
         padding: 0;
         margin: 0;
@@ -19,6 +74,85 @@
         height: 100%;
         width: 100vw;
       }
+      /* workers.coop Customisations
+       * #ef9600 for headings and other stand-out features
+       * black for titles #2f578a
+       */
+      .w3-teal { /* weirdly, seems to set colour of pin text */
+        color: #000 !important;
+      }
+      #loadingCirclespin {
+        border: 30px solid #fff;
+        border-top: 30px solid #ef9600;
+        border-left: 30px solid #ef9600;
+        width: 100px;
+        height: 100px;
+        margin-top: 40px;
+        margin-left: -50px;
+        -webkit-animation: spin 2s linear infinite;
+        /* Safari */
+        animation: spin 2s linear infinite;
+      }
+      h1, h2, h2, h4, h6, h6,
+      .advanced-label, .advanced-select,
+      #clearSearchFilterBtn {
+        font-family: --sea-font-family-emphasis;
+      }
+      h1, h2 {
+        background: transparent url(./borderOrange.png) no-repeat left bottom;
+        background-size: 45px 4px;
+        padding-bottom: 0.35rem;
+        margin-bottom: 2rem;
+      }
+      #dir-title {
+        padding-left: inherit;
+        padding-bottom: 0.35rem;
+        margin-left: 16px;
+        margin-bottom: 2rem;
+      }
+      .sea-initiative-popup h2 {
+        padding-bottom: 0.6rem;
+      }
+      /* black on orange */
+      .sea-field-all .sea-initiatives-list-sidebar-content,
+      .sea-initiatives-list-sidebar,
+      #map-app-sidebar-fixed-section .advanced-select,
+      .sea-directory-list li:hover,
+      .sea-initiative-list li:hover,
+      .sea-sidebar h2.sea-field:hover,
+      .sea-search-initiative-active,
+      .sea-directory-list li:active,
+      .w3-button:hover {
+        background-color: #ef9600 !important;
+        color: #000 !important;
+      }
+      /* whatever on orange */
+      .sea-field-active {
+        background-color: #ef9600 !important;
+      }
+      /* black on whatever */
+      .leaflet-container a {
+        color: #000 !important;
+        font-family: --sea-font-family-sans-serif;
+      }
+      /* orange on white */
+      #map-app-sidebar-button .w3-btn {
+        color: #ef9600 !important;
+        background-color: #fff !important;
+      }
+      /* orange on whatever */
+      #map-app-search-form .w3-btn {
+        color: #ef9600 !important;        
+      }
+      /* translucent black on whatever */
+      .sea-initiative-non-geo {
+        color: #000000 !important;
+      }
+      /* translucent black on whatever */
+      .sidebar-button-container .w3-button { /* clear filters */
+        background-color: #000000b3 !important;
+      }        
+        
     </style>
   </head>
   <body>
