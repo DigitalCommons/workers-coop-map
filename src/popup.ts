@@ -52,7 +52,7 @@ function getReportLink(initiative: Initiative, dataServices: DataServices, props
 
   var label: string = // FIXME typeof labels.reportAnError === 'string'? labels.reportAnError :
     'report an error';
-  return `<a href="./correction-report.html?${params.join('&')}">${label}</a>`;
+  return `<a href="./correction-report.html?${params.join('&')}" target="_blank">${label}</a>`;
 }
 
 class PopupApi {
