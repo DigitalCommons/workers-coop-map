@@ -219,36 +219,59 @@ class PopupApi {
     return template.replaceAll(/(?<!%)%s/g, str).replaceAll('%%', '%');
   }
 
-  mailLink(propertyName: string): string {
-    return this.insert(this.initiative[propertyName], 
-                       '<a class="fa fa-at" href="mailto:%s" target="_blank" ></a>');
+  mailLink(propertyName: string, template?: string): string {
+    template ??= '<a class="fa fa-at" href="mailto:%s" target="_blank" ></a>';
+    return this.insert(this.initiative[propertyName], template);
   }
-  
-  expandedLink(propertyName: string, template: string, baseUri: string = ''): string {
+
+  link(propertyName: string,
+       opts: {text?: string,
+              template?: string,
+              baseUri?: string | Record<string,string>} = {}): string {
     let value = this.initiative[propertyName];
     if (typeof value !== 'string')
       return '';
     if (value === '')
       return '';
-    let url: string = value;
-    if (!url.match(/^https?:/))
-      url = baseUri.replace(/[/]*$/, '') + url.replace(/^[/]+/, '/');
-
-    url = encodeURI(url);
     
-    return template.replaceAll(/(?<!%)%s/g, url).replaceAll('%%', '%');
+    const text = this.escapeHtml(opts.text === undefined? value : opts.text);
+    const template = opts.template ?? '<a href="%u" target="_blank" >%s</a>';
+    
+    let uri: string = value;
+
+    // Prepend the baseUri if given, and there is no URI scheme
+    if (opts.baseUri !== undefined && !uri.match(/^\w+:[/][/]/)) {
+      // There are two sorts of prepend, depending on the
+      // baseUri option type.
+      
+      if (typeof opts.baseUri === 'string') {
+        // Perform simple prefixing of the URI with baseUri as a string
+        uri = opts.baseUri.replace(/[/]*$/, '') + uri.replace(/^[/]+/, '/');
+      }
+      else {
+        // Perform qualified name expansion, when baseUri is a look-up hash
+        uri = this.qname2uri(uri, opts.baseUri);
+      }
+    }
+
+    uri = encodeURI(uri);
+    
+    return template
+      .replaceAll(/(?<!%)%s/g, text)
+      .replaceAll(/(?<!%)%u/g, uri)
+      .replaceAll('%%', '%');
   }
   
   facebookLink(propertyName: string): string {
-    return this.expandedLink(propertyName,
-                             '<a class="fab fa-facebook" href="%s" target="_blank" ></a>',
-                            'https://facebook.com');
+    return this.link(propertyName,
+                     {template: '<a class="fab fa-facebook" href="%s" target="_blank" ></a>',
+                      baseUri: 'https://facebook.com'});
   }
   
   twitterLink(propertyName: string): string {
-    return this.expandedLink(propertyName,
-                             '<a class="fab fa-twitter" href="%s" target="_blank" ></a>',
-                             'https://x.com');
+    return this.link(propertyName,
+                     {template: '<a class="fab fa-twitter" href="%s" target="_blank" ></a>',
+                      baseUri: 'https://x.com'});
   }
   
   phoneLink(propertyName: string): string {
@@ -296,12 +319,15 @@ class PopupApi {
 
 export function getPopup(initiative: Initiative, dataServices: DataServices) {
   const api = new PopupApi(initiative, dataServices);
-  const labels = dataServices.getFunctionalLabels();
   const props = ['uri', 'name', 'website']; // Need to be mapped to CiviCRM field names?
   let popupHTML = `
     <div class="sea-initiative-details">
 	    <h2 class="sea-initiative-name">${api.escapeHtml(initiative.name)}</h2>
-	    <p>${api.expandedLink('www','<a href="%s" target="_blank">%s</a>')}</p>
+      <ul class="sea-list-no-indent">
+        ${api.link('www',{template: '<li><a href="%u" target="_blank">%s</a></li>'})}
+        ${api.link('email',{template: '<li><a href="%u" target="_blank" >%s</a></li>', baseUri:'mailto:'})}
+      </ul>
+
 	    <h4 class="sea-initiative-ind">${api.getTitle('ind:')}: ${api.getTerm('industry')}</h4>
 	    <h4 class="sea-initiative-sics">${api.getTitle('sics:')}: ${api.getTerm('sicSecion')}</h4>
 	    <h4 class="sea-initiative-ot">${api.getTitle('ot:')}: ${api.getTerm('ownershipType')}</h4>
@@ -314,13 +340,8 @@ export function getPopup(initiative: Initiative, dataServices: DataServices) {
     </div>
     
     <div class="sea-initiative-contact">
-      <h3>${api.labels.contact}</h3>
+      <h3>${api.getLabel('ui:address')}</h3>
       ${api.address()}
-      
-      <p>
-        ${api.insert(initiative.email,
-                     '<a href="mailto:%s" target="_blank" >%s</a>')}
-      </p>
     </div>
   `;
 
