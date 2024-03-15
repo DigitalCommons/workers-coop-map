@@ -56,6 +56,7 @@ function getReportLink(initiative: Initiative, dataServices: DataServices, props
 }
 
 class PopupApi {
+  static readonly qNameRegex = this.mkQNameRegex();
   private readonly dataServices: DataServices;
   private readonly vocabs: VocabServices;
   readonly lang: string;
@@ -67,6 +68,31 @@ class PopupApi {
     'postcode',
     'countryId',
   ];
+
+  // Builds qNameRegex, which matches an XML ncname
+  // as per https://www.w3.org/TR/REC-xml-names/#NT-QName
+  private static mkQNameRegex(): RegExp {
+    const nameStartChar = ['_A-Z',
+                           'a-z',
+                           '\u00C0-\u00D6',
+                           '\u00D8-\u00F6',
+                           '\u00F8-\u02FF',
+                           '\u0370-\u037D',
+                           '\u037F-\u1FFF',
+                           '\u200C-\u200D',
+                           '\u2070-\u218F',
+                           '\u2C00-\u2FEF',
+                           '\u3001-\uD7FF',
+                           '\uF900-\uFDCF',
+                           '\uFDF0-\uFFFD',
+                           '\u10000-\u{EFFFF}'].join('');
+    const nameChar = nameStartChar + ['.0-9',
+                                      '\u00B7',
+                                      '\u0300-\u036F',
+                                      '\u203F-\u2040',
+                                      '-'].join(''); // note trailing - is significant
+    return new RegExp(`^([${nameStartChar}][${nameChar}]*):(.*)`);
+  }
   
   constructor(private readonly initiative: Initiative, dataServices: DataServices) {
     this.dataServices = dataServices;
@@ -131,6 +157,27 @@ class PopupApi {
           ?? this.labels.notAvailable
       );
     return this.vocabs.getTerm(uri, this.lang, defaultVal);   
+  }
+
+  // Expands a qualified name using the dictionary given.
+  //
+  // The dictionary maps abbreviations to URL bases to prepend when they are
+  // found.
+  //
+  // If there is no qualified name abbreviation, or it is not in the
+  // dictionary, the defaultValue parameter is returned instead.
+  //
+  // If the defaultValue is undefined, then the original qname is
+  // returned, unchanged except for being trimmed of whitespace.
+  qname2uri(qname: string, dict: Record<string, string>, defaultValue?: string): string {
+    qname = qname.trim();
+    // Parse the qname 
+    const [_, abbrev, rest] = PopupApi.qNameRegex.exec(qname);
+    if (_ != null && abbrev in dict) { // note loose match also matches undefined
+      const expansion = dict[abbrev];
+      return expansion+rest;
+    }
+    return defaultValue ?? qname;
   }
 
   escapeHtml(text: unknown): string {
