@@ -319,7 +319,7 @@ class PopupApi {
 
 export function getPopup(initiative: Initiative, dataServices: DataServices) {
   const api = new PopupApi(initiative, dataServices);
-  const props = ['uri', 'name', 'website']; // Need to be mapped to CiviCRM field names?
+  const props = ['uri', 'name', 'email', 'www', 'industry']; // Need to be mapped to CiviCRM field names?
   let popupHTML = `
     <div class="sea-initiative-details">
 	    <h2 class="sea-initiative-name">${api.escapeHtml(initiative.name)}</h2>
