@@ -1,7 +1,7 @@
 import { DataServices, isVocabPropDef } from "mykomap/app/model/data-services";
 import type { Vocab, VocabServices } from "mykomap/app/model/vocabs";
-import { Initiative } from "mykomap/src/map-app/app/model/initiative";
-import { PhraseBook } from "mykomap/src/map-app/localisations";
+import { Initiative } from "mykomap/app/model/initiative";
+import { PhraseBook } from "mykomap/localisations";
 
 
 
