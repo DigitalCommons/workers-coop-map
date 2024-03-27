@@ -107,7 +107,7 @@ export const config: ConfigData = new ConfigData({
   filterableFields: [
     'industry',
     'ownershipType',
-//    'regStatus',
+    'regStatus',
   ],
   searchedFields: [
     'name',
