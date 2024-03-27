@@ -7,6 +7,7 @@ import type {
 import {
   mkObjTransformer,
   Transforms as T,
+  DataVal
 } from "mykomap/obj-transformer";
 import * as versions from "./version.json";
 
@@ -16,10 +17,9 @@ import { InitiativeObj } from "mykomap/app/model/initiative";
 
 const deployPrefix = 'dev.';
 
-type Row = Record<string, string|null|undefined>;
 const baseUri = `https://${deployPrefix}lod.coop/workers-coop/`;
 
-const rowToObj = mkObjTransformer<Row, InitiativeObj>({
+const rowToObj = mkObjTransformer<Record<string, DataVal>, InitiativeObj>({
   uri: T.prefixed(baseUri).from('Identifier'),
   name: T.text('').from('Name'),
   lat: T.nullable.number(null).from('Latitude'),
