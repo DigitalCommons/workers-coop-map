@@ -14,8 +14,10 @@ import about from "./about.html";
 import { getPopup } from './popup';
 import { InitiativeObj } from "mykomap/app/model/initiative";
 
+const deployPrefix = 'dev.';
+
 type Row = Record<string, string|null|undefined>;
-const baseUri = 'https://dev.lod.coop/workers-coop/';
+const baseUri = `https://${deployPrefix}lod.coop/workers-coop/`;
 
 const rowToObj = mkObjTransformer<Row, InitiativeObj>({
   uri: T.prefixed(baseUri).from('Identifier'),
@@ -118,7 +120,7 @@ export const config: ConfigData = new ConfigData({
       type: 'json',
       id: 'essglobal',
       label: 'ESSGLOBAL 2.1',
-      url: 'https://dev.data.solidarityeconomy.coop/workers-coop/vocabs.json',
+      url: `https://${deployPrefix}data.solidarityeconomy.coop/workers-coop/vocabs.json`,
     },
     {
       type: 'json',
@@ -132,7 +134,7 @@ export const config: ConfigData = new ConfigData({
       id: 'workers-coop',
       label: 'Workers.Coop',
       type: 'csv',
-      url: 'https://dev.data.solidarityeconomy.coop/workers-coop/standard.csv',
+      url: `https://${deployPrefix}data.solidarityeconomy.coop/workers-coop/standard.csv`,
       transform: rowToObj,
     },
   ],
