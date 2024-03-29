@@ -17,6 +17,6 @@
   "license": "UNLICENSED",
   "repository": "github:DigitalCommons/workers-coop-map",
   "dependencies": {
-    "mykomap": "github:DigitalCommons/mykomap#semver:^3.1.5"
+    "mykomap": "github:DigitalCommons/mykomap#semver:^3.1.6"
   }
 }
