@@ -74,6 +74,7 @@ const fields: FieldsDef = {
   industry: {
     type: 'vocab',
     uri: 'ind:',
+    filter: undefined,
   },
   sicCode: {
     type: 'vocab',
@@ -86,6 +87,7 @@ const fields: FieldsDef = {
   ownershipType: {
     type: 'vocab',
     uri: 'ot:',
+    filter: undefined,
   },
   legalForm: {
     type: 'vocab',
@@ -94,6 +96,7 @@ const fields: FieldsDef = {
   regStatus: {
     type: 'vocab',
     uri: 'rst:',
+    filter: 'rst:1',
   },
   regNo: 'value',
   within: 'value',
@@ -104,11 +107,6 @@ export const config: ConfigData = new ConfigData({
   namedDatasets: ['workers-coop'],
   htmlTitle: 'Workers.Coop',
   fields: fields,
-  filterableFields: [
-    'industry',
-    'ownershipType',
-    'regStatus',
-  ],
   searchedFields: [
     'name',
     'description',
