@@ -2,7 +2,7 @@ import { DataServices, isVocabPropDef } from "mykomap/app/model/data-services";
 import type { Vocab, VocabServices } from "mykomap/app/model/vocabs";
 import { Initiative } from "mykomap/app/model/initiative";
 import { PhraseBook } from "mykomap/localisations";
-
+import { toString as _toString } from "mykomap/utils";
 
 
 // Returns an array of at least one string, which may be empty.
@@ -31,28 +31,12 @@ function stringify(value: unknown): string[] {
 }
 
 function getReportLink(initiative: Initiative, dataServices: DataServices, props: string[]) {
-  var params = props.map(name => {
-    const propDef = dataServices.getPropertySchema(name);
-    const value = initiative[name];
-    if (propDef == undefined)
-      return undefined;
-    let paramVal: string;
-    switch (propDef.type) {
-      case 'value':
-      case 'custom':
-      case 'vocab':
-        paramVal = stringify(value)[0];
-        break;
-      case 'multi':
-        paramVal = stringify(value)[0];
-        break;
-    }
-    return `${encodeURIComponent(name)}=${encodeURIComponent(paramVal)}?`;
-  }).filter(val => val !== undefined);
-
-  var label: string = // FIXME typeof labels.reportAnError === 'string'? labels.reportAnError :
-    'report an error';
-  return `<a href="./correction-report.html?${params.join('&')}" target="_blank">${label}</a>`;
+  const uri = _toString(initiative.uri);
+  const contactId = uri.replace(/^.*\//, '');
+  const label = // FIXME typeof labels.reportAnError === 'string'? labels.reportAnError :
+    'Report an error';
+  const url = `https://www.workers.coop/help-us-improve-our-data?cid=${contactId}`
+  return `<a href="${url}" target="_blank">${label} <i class="fa fa-external-link-alt"></i></a>`;
 }
 
 class PopupApi {
@@ -335,13 +319,12 @@ export function getPopup(initiative: Initiative, dataServices: DataServices) {
 	    <h4 class="sea-initiative-regno">${api.getLabel('ui:regNo')}: ${api.getVal('regNo')}</h4>
 	    <h4 class="sea-initiative-rst">${api.getTitle('rst:')}: ${api.getTerm('regStatus')}</h4>
       <p>${initiative.description || ''}</p>
-
-      <p>${getReportLink(initiative, dataServices, props)}</p>
     </div>
     
     <div class="sea-initiative-contact">
       <h3>${api.getLabel('ui:address')}</h3>
       ${api.address()}
+      <p>${getReportLink(initiative, dataServices, props)}</p>
     </div>
   `;
 
