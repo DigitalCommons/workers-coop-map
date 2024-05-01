@@ -318,7 +318,6 @@ export function getPopup(initiative: Initiative, dataServices: DataServices) {
 	    <h4 class="sea-initiative-lf">${api.getTitle('lf:')}: ${api.getTerm('legalForm')}</h4>
 	    <h4 class="sea-initiative-regno">${api.getLabel('ui:regNo')}: ${api.getVal('regNo')}</h4>
 	    <h4 class="sea-initiative-rst">${api.getTitle('rst:')}: ${api.getTerm('regStatus')}</h4>
-      <p>${initiative.description || ''}</p>
     </div>
     
     <div class="sea-initiative-contact">

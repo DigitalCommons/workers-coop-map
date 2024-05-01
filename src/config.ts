@@ -26,7 +26,6 @@ const rowToObj = mkObjTransformer<Record<string, DataVal>, InitiativeObj>({
   lng: T.nullable.number(null).from('Longitude'),
   manLat: T.nullable.number(null).from('Geo Container Latitude'),
   manLng: T.nullable.number(null).from('Geo Container Longitude'),
-  desc: T.text('').from('Description'),
   baseMembershipType: T.nullable.prefixed('bmt:', null).from('Membership Type'),
   orgStructure: T.nullable.prefixed('os:', null).from('Organisational Structure'),
   primaryActivity: T.nullable.prefixed('aci:', null).from('Primary Activity'),
@@ -50,7 +49,6 @@ const rowToObj = mkObjTransformer<Record<string, DataVal>, InitiativeObj>({
 type Dictionary<T> = Partial<Record<string, T>>;
 type FieldsDef = Dictionary<PropDef | 'value' >;
 const fields: FieldsDef = {
-  desc: 'value',
   street: 'value',
   locality: 'value',
   postcode: 'value',
@@ -109,7 +107,7 @@ export const config: ConfigData = new ConfigData({
   fields: fields,
   searchedFields: [
     'name',
-    'description',
+    'address',
   ],
   languages: ['EN'],
   language: 'EN',
