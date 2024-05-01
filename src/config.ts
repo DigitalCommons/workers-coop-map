@@ -139,6 +139,11 @@ export const config: ConfigData = new ConfigData({
   showDatasetsPanel: false,
   showDirectoryPanel: true,
   defaultLatLng: [53.619840, -2.160080],
+  dialogueSize: {
+    width: "45vw",
+    height: "300px",
+    descriptionRatio: 2.5
+  },
   logo: "logo.png",
   customPopup: getPopup,
   aboutHtml: about,
