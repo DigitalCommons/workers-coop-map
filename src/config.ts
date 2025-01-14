@@ -116,7 +116,7 @@ export const config: ConfigData = new ConfigData({
       type: 'json',
       id: 'essglobal',
       label: 'ESSGLOBAL 2.1',
-      url: `https://${deployPrefix}data.solidarityeconomy.coop/workers-coop/vocabs.json`,
+      url: `https://${deployPrefix}data.digitalcommons.coop/workers-coop/vocabs.json`,
     },
     {
       type: 'json',
@@ -130,7 +130,7 @@ export const config: ConfigData = new ConfigData({
       id: 'workers-coop',
       label: 'Workers.Coop',
       type: 'csv',
-      url: `https://${deployPrefix}data.solidarityeconomy.coop/workers-coop/standard.csv`,
+      url: `https://${deployPrefix}data.digitalcommons.coop/workers-coop/standard.csv`,
       transform: rowToObj,
     },
   ],
