@@ -5,30 +5,6 @@ import { PhraseBook } from "mykomap/localisations";
 import { toString as _toString } from "mykomap/utils";
 
 
-// Returns an array of at least one string, which may be empty.
-function stringify(value: unknown): string[] {
-  switch(typeof value) {
-    case 'string': return [value];
-    case 'number':
-    case 'boolean':
-      return [String(value)];
-    case 'object':
-      if (value instanceof Date) {
-        return [String(value)];
-      }
-      if (value instanceof Array) {
-        const vals = value.flatMap(item => stringify(item));
-        if (vals.length > 0)
-          return vals;
-        else
-          return ['']; // Ensure at least one element
-      }
-      // Other objects? Note - no plain objects expected.
-      // Fall through.
-    default:
-      return [''];  
-  }
-}
 
 function getReportLink(initiative: Initiative, dataServices: DataServices, props: string[]) {
   const uri = _toString(initiative.uri);
