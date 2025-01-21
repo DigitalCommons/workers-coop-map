@@ -97,10 +97,10 @@
         /* Safari */
         animation: spin 2s linear infinite;
       }
-      h1, h2, h2, h4, h6, h6,
+      h1, h2, h3, h4, h5, h6,
       .advanced-label, .advanced-select,
       #clearSearchFilterBtn {
-        font-family: --sea-font-family-emphasis;
+        font-family: var(--sea-font-family-emphasis);
       }
       h1, h2 {
         background: transparent url(./borderOrange.png) no-repeat left bottom;
@@ -114,11 +114,22 @@
         margin-left: 16px;
         margin-bottom: 2rem;
       }
+      .sea-initiative-popup p,
+      .sea-initiative-popup h3,
+      .sea-initiative-popup h4  {
+        font-size: 0.85rem;
+      }
       .sea-initiative-popup h2 {
+        padding-bottom: 0.6rem;
+      }
+      .sea-initiative-popup h1 {
         padding-bottom: 0.6rem;
       }
       .leaflet-marker-pane .sea-marker {
         background: url(pin.png);
+      }
+      .sea-initiative-contact a {
+        word-break: normal;
       }
       /* black on orange */
       .sea-field-all .sea-initiatives-list-sidebar-content,
@@ -140,7 +151,7 @@
       /* black on whatever */
       .leaflet-container a {
         color: #000 !important;
-        font-family: --sea-font-family-sans-serif;
+        font-family: var(--sea-font-family-sans-serif);
       }
       /* orange on white */
       #map-app-sidebar-button .w3-btn {

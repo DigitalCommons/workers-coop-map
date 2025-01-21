@@ -2,57 +2,17 @@ import { DataServices, isVocabPropDef } from "mykomap/app/model/data-services";
 import type { Vocab, VocabServices } from "mykomap/app/model/vocabs";
 import { Initiative } from "mykomap/app/model/initiative";
 import { PhraseBook } from "mykomap/localisations";
+import { toString as _toString } from "mykomap/utils";
 
 
-
-// Returns an array of at least one string, which may be empty.
-function stringify(value: unknown): string[] {
-  switch(typeof value) {
-    case 'string': return [value];
-    case 'number':
-    case 'boolean':
-      return [String(value)];
-    case 'object':
-      if (value instanceof Date) {
-        return [String(value)];
-      }
-      if (value instanceof Array) {
-        const vals = value.flatMap(item => stringify(item));
-        if (vals.length > 0)
-          return vals;
-        else
-          return ['']; // Ensure at least one element
-      }
-      // Other objects? Note - no plain objects expected.
-      // Fall through.
-    default:
-      return [''];  
-  }
-}
 
 function getReportLink(initiative: Initiative, dataServices: DataServices, props: string[]) {
-  var params = props.map(name => {
-    const propDef = dataServices.getPropertySchema(name);
-    const value = initiative[name];
-    if (propDef == undefined)
-      return undefined;
-    let paramVal: string;
-    switch (propDef.type) {
-      case 'value':
-      case 'custom':
-      case 'vocab':
-        paramVal = stringify(value)[0];
-        break;
-      case 'multi':
-        paramVal = stringify(value)[0];
-        break;
-    }
-    return `${encodeURIComponent(name)}=${encodeURIComponent(paramVal)}?`;
-  }).filter(val => val !== undefined);
-
-  var label: string = // FIXME typeof labels.reportAnError === 'string'? labels.reportAnError :
-    'report an error';
-  return `<a href="./correction-report.html?${params.join('&')}" target="_blank">${label}</a>`;
+  const uri = _toString(initiative.uri);
+  const contactId = uri.replace(/^.*\//, '');
+  const label = // FIXME typeof labels.reportAnError === 'string'? labels.reportAnError :
+    'Report an error';
+  const url = `https://www.workers.coop/help-us-improve-our-data?cid=${contactId}`
+  return `<a href="${url}" target="_blank">${label} <i class="fa fa-external-link-alt"></i></a>`;
 }
 
 class PopupApi {
@@ -189,41 +149,6 @@ class PopupApi {
       .replaceAll("'", '&#039;');
   }
   
-  // Expands a template with a value, but only if the value given is
-  // not undefined, null, or the empty string (when stringified).
-  //
-  // Otherwise, if a `default` option is given, that is returned,
-  // and if absent, the empty string.
-  //
-  // The template is a string in which all values of `%s` are replaced
-  // by the value, and all values of `%%` are replaced with `%`. (This
-  // is so that percents can be inserted. In other words: to insert
-  // a literal `%s`, use `%%s`).
-  //
-  // Note: unless the `escape` option is present and false, the value
-  // itself will be HTML escaped. The template and defaultValue will not be.
-  insert(value: unknown, template: string, opts: {default?: string, escape?: boolean} = {}): string {
-    const defaultValue = opts.default ?? '';
-    
-    if (value === undefined || value === null)
-      return defaultValue;
-
-    let str = String(value);
-
-    if (str === '')
-      return defaultValue;
-
-    if (opts.escape !== false)
-      str = this.escapeHtml(str);
-
-    return template.replaceAll(/(?<!%)%s/g, str).replaceAll('%%', '%');
-  }
-
-  mailLink(propertyName: string, template?: string): string {
-    template ??= '<a class="fa fa-at" href="mailto:%s" target="_blank" ></a>';
-    return this.insert(this.initiative[propertyName], template);
-  }
-
   link(propertyName: string,
        opts: {text?: string,
               template?: string,
@@ -257,8 +182,8 @@ class PopupApi {
     uri = encodeURI(uri);
     
     return template
-      .replaceAll(/(?<!%)%s/g, text)
-      .replaceAll(/(?<!%)%u/g, uri)
+      .replaceAll(/%s/g, text)
+      .replaceAll(/%u/g, uri)
       .replaceAll('%%', '%');
   }
   
@@ -272,11 +197,6 @@ class PopupApi {
     return this.link(propertyName,
                      {template: '<a class="fab fa-twitter" href="%s" target="_blank" ></a>',
                       baseUri: 'https://x.com'});
-  }
-  
-  phoneLink(propertyName: string): string {
-    return this.insert(this.initiative[propertyName],
-                       '<a class="fa fa-at" href="tel:%s" target="_blank" ></a>');
   }
   
   address(): string {
@@ -334,14 +254,12 @@ export function getPopup(initiative: Initiative, dataServices: DataServices) {
 	    <h4 class="sea-initiative-lf">${api.getTitle('lf:')}: ${api.getTerm('legalForm')}</h4>
 	    <h4 class="sea-initiative-regno">${api.getLabel('ui:regNo')}: ${api.getVal('regNo')}</h4>
 	    <h4 class="sea-initiative-rst">${api.getTitle('rst:')}: ${api.getTerm('regStatus')}</h4>
-      <p>${initiative.description || ''}</p>
-
-      <p>${getReportLink(initiative, dataServices, props)}</p>
     </div>
     
     <div class="sea-initiative-contact">
       <h3>${api.getLabel('ui:address')}</h3>
       ${api.address()}
+      <p>${getReportLink(initiative, dataServices, props)}</p>
     </div>
   `;
 

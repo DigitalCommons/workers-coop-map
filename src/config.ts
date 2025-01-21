@@ -15,7 +15,7 @@ import about from "./about.html";
 import { getPopup } from './popup';
 import { InitiativeObj } from "mykomap/app/model/initiative";
 
-const deployPrefix = 'dev.';
+const deployPrefix = '';
 
 const baseUri = `https://${deployPrefix}lod.coop/workers-coop/`;
 
@@ -26,7 +26,6 @@ const rowToObj = mkObjTransformer<Record<string, DataVal>, InitiativeObj>({
   lng: T.nullable.number(null).from('Longitude'),
   manLat: T.nullable.number(null).from('Geo Container Latitude'),
   manLng: T.nullable.number(null).from('Geo Container Longitude'),
-  desc: T.text('').from('Description'),
   baseMembershipType: T.nullable.prefixed('bmt:', null).from('Membership Type'),
   orgStructure: T.nullable.prefixed('os:', null).from('Organisational Structure'),
   primaryActivity: T.nullable.prefixed('aci:', null).from('Primary Activity'),
@@ -50,7 +49,6 @@ const rowToObj = mkObjTransformer<Record<string, DataVal>, InitiativeObj>({
 type Dictionary<T> = Partial<Record<string, T>>;
 type FieldsDef = Dictionary<PropDef | 'value' >;
 const fields: FieldsDef = {
-  desc: 'value',
   street: 'value',
   locality: 'value',
   postcode: 'value',
@@ -109,7 +107,7 @@ export const config: ConfigData = new ConfigData({
   fields: fields,
   searchedFields: [
     'name',
-    'description',
+    'address',
   ],
   languages: ['EN'],
   language: 'EN',
@@ -118,7 +116,7 @@ export const config: ConfigData = new ConfigData({
       type: 'json',
       id: 'essglobal',
       label: 'ESSGLOBAL 2.1',
-      url: `https://${deployPrefix}data.solidarityeconomy.coop/workers-coop/vocabs.json`,
+      url: `https://${deployPrefix}data.digitalcommons.coop/workers-coop/vocabs.json`,
     },
     {
       type: 'json',
@@ -132,13 +130,18 @@ export const config: ConfigData = new ConfigData({
       id: 'workers-coop',
       label: 'Workers.Coop',
       type: 'csv',
-      url: `https://${deployPrefix}data.solidarityeconomy.coop/workers-coop/standard.csv`,
+      url: `https://${deployPrefix}data.digitalcommons.coop/workers-coop/standard.csv`,
       transform: rowToObj,
     },
   ],
   showDatasetsPanel: false,
   showDirectoryPanel: true,
   defaultLatLng: [53.619840, -2.160080],
+  dialogueSize: {
+    width: "45vw",
+    height: "300px",
+    descriptionRatio: 2.5
+  },
   logo: "logo.png",
   customPopup: getPopup,
   aboutHtml: about,
